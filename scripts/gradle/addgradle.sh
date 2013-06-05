@@ -14,7 +14,7 @@
 
 if [ "$#" -lt "2" ]
 	then
-	echo "addgradle.sh <path> <compile sdk version>"
+	echo "addgradle.sh <path> <compile sdk version> [gradle version]"
 	exit
 fi
 
@@ -22,12 +22,16 @@ fi
 TARGET_PROJECT_PATH="$1"
 PROJECT_COMPILE_SDK_VERSION="$2"
 
-# Create the gradle main directory structure
-if [ -f "${TARGET_PROJECT_PATH}/src" ];
+if [ -z "$3"]
 	then
-	mkdir -p ${TARGET_PROJECT_PATH}/src/main/java
-	mkdir -p ${TARGET_PROJECT_PATH}/src/main/res
+	GRADLE_VERSION="1.6"
+else
+	GRADLE_VERSION="$3"
 fi
+
+# Create the gradle main directory structure
+mkdir -p ${TARGET_PROJECT_PATH}/src/main/java
+mkdir -p ${TARGET_PROJECT_PATH}/src/main/res
 
 # Create the build.gradle file
 if [ ! -f "${TARGET_PROJECT_PATH}/build.gradle" ];
@@ -41,6 +45,7 @@ if [ ! -f "${TARGET_PROJECT_PATH}/build.gradle" ];
 	echo -e "\t\tclasspath 'com.android.tools.build:gradle:0.4.2'" >> ${TARGET_PROJECT_PATH}/build.gradle
 	echo -e "\t}" >> ${TARGET_PROJECT_PATH}/build.gradle
 	echo -e "}" >> ${TARGET_PROJECT_PATH}/build.gradle
+	echo -e "task wrapper(type: Wrapper) {\n\tgradleVersion = '${GRADLE_VERSION}'\n}" >> ${TARGET_PROJECT_PATH}/build.gradle	
 	echo -e "apply plugin: 'android'\n" >> ${TARGET_PROJECT_PATH}/build.gradle
 	echo "android {" >> ${TARGET_PROJECT_PATH}/build.gradle
 	echo -e "\tcompileSdkVersion ${PROJECT_COMPILE_SDK_VERSION}" >> ${TARGET_PROJECT_PATH}/build.gradle
